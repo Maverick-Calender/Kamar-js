@@ -1,0 +1,22 @@
+{
+  "name": "kamar-js",
+  "version": "0.0.1",
+  "description": "A node-js module for the KAMAR API.",
+  "main": "kamar-js.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Kamar",
+    "Requests"
+  ],
+  "author": "Jonathan Voss",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "chalk": "^4.1.1",
+    "fast-xml-parser": "^3.19.0",
+    "moment-timezone": "^0.5.33",
+    "qs": "^6.10.1"
+  }
+}
