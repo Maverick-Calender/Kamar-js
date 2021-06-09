@@ -14,7 +14,7 @@ class Kamar {
         TT,
         UserAgent = `Kamar-JS v${version}`,
         timezone = 'Pacific/Auckland',
-        calendar = undefined,
+        calender = undefined,
         timeout = 10000
     }) {
         if (!portal)
@@ -23,7 +23,7 @@ class Kamar {
         this.TT = TT || (this.year + 'TT');
         this.portal = portal;
         this.UserAgent = UserAgent;
-        this.calendar = calendar;
+        this.calender = calender;
         this.timezone = timezone;
         this.timeout = timeout;
         // ^ We need to be flexible for Chatham Is., Cook Is., Tokelau, & Niue, which
@@ -34,10 +34,10 @@ class Kamar {
     }
 
     /**
-     * Add two numbers together
+     * Logins into the Kamar API and returns a credentials object
      * @param  {String} username The sstudent's Kamar login username
      * @param  {String} password The student's Kamar login password
-     * @return {Student} Returns a new Student object from the logon result
+     * @return {credentials} Returns a new credentials object from the logon result
      */
     logon(username, password) {
         return this.sendCommand({
@@ -46,13 +46,75 @@ class Kamar {
             Username: username,
             Password: password
         }).then(credentials => {
-            return {
-                username,
-                'StudentID': credentials.LogonResults.CurrentStudent,
-                'key': credentials.LogonResults.Key,
-                'AccessLevel': credentials.LogonResults.AccessLevel
-            };
+            if (credentials.LogonResults.Success && credentials.LogonResults.Success == 'YES')
+                return {
+                    username,
+                    'studentID': credentials.LogonResults.CurrentStudent,
+                    'key': credentials.LogonResults.Key,
+                    'accessLevel': credentials.LogonResults.AccessLevel
+                };
+            throw credentials.LogonResults.Error;
         });
+    }
+
+    /**
+     * Gets the student's school calender infomation
+     * @param  {Object} credentials The sstudent's Kamar login username
+     * @return {Calender} Returns a new Calender Week object
+     */
+    getCalendar(credentials) {
+        return this.sendCommand({
+            Command: 'GetCalendar',
+            Key: credentials.key,
+            Year: this.year
+        }).then(calender => {
+            this.calender = calender.CalendarResults.Days;
+
+            return calender.CalendarResults.Days.Day.find(Days => Days.Date === this.getDateFormat())
+            throw calender.CalendarResults.Error;
+        });
+    }
+
+     /**
+     * Gets the student's timetable of the current day
+     * @param  {Object} credentials The sstudent's Kamar login object, can be obtianed using kamar.logon()
+     * @param  {Object} calender The student's calender object
+     * @return {Timetable} Returns an array of the periods for the current day
+     */
+    getTimetable(credentials, calender) {
+        return this
+            .sendCommand({
+                Command: 'GetStudentTimetable',
+                Key: credentials.key,
+                studentID: credentials.studentID,
+                Grid: this.TT
+            })
+            .then((timetable) => {
+                return this.sendCommand({
+                    Command: 'GetGlobals',
+                    Key: credentials.key
+                }).then((respone) => {
+                    let weekDay = (calender.DayTT > 5) ? calender.DayTT - 5 : calender.DayTT
+                    let x = timetable.StudentTimetableResults.Students.Student.TimetableData[`W${calender.Week}`][`D${weekDay}`]
+                    let count = 0;
+
+                    const day = [];
+                    
+                    x.split('|').slice(2, -2).forEach((z) => {
+                        var period = z.split('-');
+                        count++;
+
+                        day.push({
+                            Class: period[2],
+                            Roon: period[4],
+                            Teacher: period[3],
+                            Time: respone.GlobalsResults.StartTimes.Day[1].PeriodTime[count]
+                        });
+                    })
+
+                    return day
+                })
+            })
     }
 
     sendCommand(form) {
@@ -70,6 +132,10 @@ class Kamar {
                 }).then((response) => resolve(parser.parse(response.data)))
                 .catch((error) => reject(error))
         })
+    }
+
+    getDateFormat() {
+        return new Date().toISOString().slice(0, 10)
     }
 }
 
