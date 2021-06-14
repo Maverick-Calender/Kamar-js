@@ -4,7 +4,6 @@ const {
     axios = require('axios'),
     qs = require('qs'),
     parser = require('fast-xml-parser'),
-    chalk = require('chalk'),
     moment = require('moment-timezone');
 
 class Kamar {
@@ -27,7 +26,7 @@ class Kamar {
         this.timezone = timezone;
         this.timeout = timeout;
         // ^ We need to be flexible for Chatham Is., Cook Is., Tokelau, & Niue, which
-        //   are all part of NZ but in a different timezone, whcih can cause issues.
+        //   are all part of NZ but in a different timezone, which can cause issues.
 
         moment.tz.setDefault(this.timezone);
         moment.locale('en-nz');
@@ -35,7 +34,7 @@ class Kamar {
 
     /**
      * Logins into the Kamar API and returns a credentials object
-     * @param  {String} username The sstudent's Kamar login username
+     * @param  {String} username The student's Kamar login username
      * @param  {String} password The student's Kamar login password
      * @return {credentials} Returns a new credentials object from the logon result
      */
@@ -58,8 +57,8 @@ class Kamar {
     }
 
     /**
-     * Gets the student's school calender infomation
-     * @param  {Object} credentials The sstudent's Kamar login username
+     * Gets the student's school calender information
+     * @param  {Object} credentials The student's Kamar login username
      * @return {Calender} Returns a new Calender Week object
      */
     getCalendar(credentials) {
@@ -77,7 +76,7 @@ class Kamar {
 
      /**
      * Gets the student's timetable of the current day
-     * @param  {Object} credentials The sstudent's Kamar login object, can be obtianed using kamar.logon()
+     * @param  {Object} credentials The student's Kamar login object, can be obtained using kamar.logon()
      * @param  {Object} calender The student's calender object
      * @return {Timetable} Returns an array of the periods for the current day
      */
@@ -93,7 +92,7 @@ class Kamar {
                 return this.sendCommand({
                     Command: 'GetGlobals',
                     Key: credentials.key
-                }).then((respone) => {
+                }).then((response) => {
                     let weekDay = (calender.DayTT > 5) ? calender.DayTT - 5 : calender.DayTT
                     let x = timetable.StudentTimetableResults.Students.Student.TimetableData[`W${calender.Week}`][`D${weekDay}`]
                     let count = 0;
@@ -106,9 +105,9 @@ class Kamar {
 
                         day.push({
                             Class: period[2],
-                            Roon: period[4],
+                            Room: period[4],
                             Teacher: period[3],
-                            Time: respone.GlobalsResults.StartTimes.Day[1].PeriodTime[count]
+                            Time: response.GlobalsResults.StartTimes.Day[1].PeriodTime[count]
                         });
                     })
 
