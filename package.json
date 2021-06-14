@@ -1,6 +1,6 @@
 {
   "name": "kamar-js",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A node-js module for the KAMAR API.",
   "main": "kamar-js.js",
   "scripts": {
