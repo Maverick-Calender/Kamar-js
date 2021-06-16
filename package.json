@@ -1,7 +1,11 @@
 {
   "name": "kamar-js",
   "version": "0.1.1",
-  "description": "A node-js module for the KAMAR API.",
+  "description": "A simple, promised based wrapper for working with the Kamar API",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maverick-calender/kamar-js.git"
+  },
   "main": "kamar-js.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,7 +14,11 @@
     "Kamar",
     "Requests"
   ],
-  "author": "Jonathan Voss",
+  "author": {
+    "name": "Jonathan Voss",
+    "email": "asteroidslive@outlook.com",
+    "url": "https://github.com/asteroidsgithub"
+  },
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.1",

@@ -69,16 +69,16 @@ class Kamar {
         }).then(calender => {
             this.calender = calender.CalendarResults.Days;
 
-            return calender.CalendarResults.Days.Day.find(Days => Days.Date === this.getDateFormat())
+            return calender.CalendarResults.Days.Day.find(Days => Days.Date === moment().format('YYYY-MM-D'))
             throw calender.CalendarResults.Error;
         });
     }
 
-     /**
-     * Gets the student's timetable of the current day
+    /**
+     * Gets the student's timetable of the current week
      * @param  {Object} credentials The student's Kamar login object, can be obtained using kamar.logon()
      * @param  {Object} calender The student's calender object
-     * @return {Timetable} Returns an array of the periods for the current day
+     * @return {Timetable} Returns an array of the periods for the current week
      */
     getTimetable(credentials, calender) {
         return this
@@ -93,27 +93,49 @@ class Kamar {
                     Command: 'GetGlobals',
                     Key: credentials.key
                 }).then((response) => {
-                    let weekDay = (calender.DayTT > 5) ? calender.DayTT - 5 : calender.DayTT
-                    let x = timetable.StudentTimetableResults.Students.Student.TimetableData[`W${calender.Week}`][`D${weekDay}`]
-                    let count = 0;
+                    let x = timetable.StudentTimetableResults.Students.Student.TimetableData[`W${calender.Week}`]
+                    const week = [];
 
-                    const day = [];
-                    
-                    x.split('|').slice(2, -2).forEach((z) => {
-                        var period = z.split('-');
-                        count++;
+                    for (var weekDay = 1; weekDay <= 5; weekDay++) {
+                        const day = [];
 
-                        day.push({
-                            Class: period[2],
-                            Room: period[4],
-                            Teacher: period[3],
-                            Time: response.GlobalsResults.StartTimes.Day[1].PeriodTime[count]
+                        let period = x[`D${weekDay}`]
+                        let count = 0;
+
+                        period.split('|').slice(2, -2).forEach((z) => {
+                            var period = z.split('-');
+                            count++;
+    
+                            day.push({
+                                Class: period[2],
+                                Room: period[4],
+                                Teacher: period[3],
+                                Time: response.GlobalsResults.StartTimes.Day[1].PeriodTime[count]
+                            });
+                        })
+    
+                        week.push({
+                            Day: day
                         });
-                    })
-
-                    return day
+                    }
+                    
+                    return week
                 })
             })
+    }
+
+    getNotices(credentials) {
+        return this.sendCommand({
+            Command: 'GetNotices',
+            Key: credentials.key,
+            Date: moment().format('L'),
+            ShowAll: 'YES'
+        }).then(notices => {
+            return {
+                'meeting': notices.NoticesResults.MeetingNotices.Meeting,
+                'general': notices.NoticesResults.GeneralNotices.General
+            }
+        })
     }
 
     sendCommand(form) {
@@ -131,10 +153,6 @@ class Kamar {
                 }).then((response) => resolve(parser.parse(response.data)))
                 .catch((error) => reject(error))
         })
-    }
-
-    getDateFormat() {
-        return new Date().toISOString().slice(0, 10)
     }
 }
 
