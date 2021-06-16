@@ -51,20 +51,21 @@ kamar.logon("web.student", "student").then(credentials => {
 
 #### Breakdown of the Code
 
-
+###### Creating a Kamar object
 ```javascript
 const Kamar = require('kamar-js'),
       kamar = new Kamar({ portal: 'demo.school.kiwi' });
 ```
-###### Creating a Kamar object
+
 
 This is where we construct the new Kamar object, the only required parameter is `portal`
 
+###### Logging in
 ```javascript
 kamar.logon("web.student", "student").then(credentials => { 
 ```
-###### Logging in
 
+###### A example of the credentials object
 ```
 {
   username: 'web.student',
@@ -73,16 +74,16 @@ kamar.logon("web.student", "student").then(credentials => {
   accessLevel: 0
 }
 ```
-###### A example of the credentials object
+
 
 From that Kamar object we start to authenticate a Student using their portal username and password. This will return a credentials object which looks like this 
 
-
+###### Getting the calender
 ```javascript
 kamar.getCalendar(credentials)
 ```
-###### Getting the calender
 
+###### A example of the calender day object
 ```
 {
   Date: '2021-06-14',
@@ -96,11 +97,11 @@ kamar.getCalendar(credentials)
   TermYear: 7
 }
 ```
-###### A example of the calender day object
+
 
 After the authentication is ready we call `kamar.getCalender()`, this is the first and only time that we will need to call this as when it is called it is assigned globally to the Kamar object. But for simplicity only `DayTT`, `Date` and `Week` are passed to the Timetable
 
-
+###### Getting the Student's Timetable for this week
 ```javascript
 .then(calender => kamar.getTimetable(credentials, calender))
 .then(timetable => {
@@ -108,8 +109,8 @@ After the authentication is ready we call `kamar.getCalender()`, this is the fir
     // Anything you want to do with the timetable. 
 })
 ```
-###### Getting the Student's Timetable for this week
 
+###### A example of the Timetable object
 ```
 [
   { Class: 'L2DIT', Room: 'B13', Teacher: 'SCH', Time: '08:45' },
@@ -132,6 +133,6 @@ After the authentication is ready we call `kamar.getCalender()`, this is the fir
   { Class: 'L2EN1', Room: 'E5', Teacher: 'CHI', Time: '14:20' }
 ]
 ```
-###### A example of the Timetable object
+
 
 Finally we call `kamar.GetTimetable()` This takes the calender and credentials objects from before and turns them into a array of Periods with `Class`, `Room`, `Teacher` and `Time`. If undefined this is because of unmarked events, assemblies or lunch breaks.
