@@ -81,47 +81,51 @@ class Kamar {
      * @return {Timetable} Returns an array of the periods for the current week
      */
     getTimetable(credentials, calender) {
-        return this
-            .sendCommand({
-                Command: 'GetStudentTimetable',
-                Key: credentials.key,
-                studentID: credentials.studentID,
-                Grid: this.TT
-            })
-            .then((timetable) => {
-                return this.sendCommand({
-                    Command: 'GetGlobals',
-                    Key: credentials.key
-                }).then((response) => {
-                    let x = timetable.StudentTimetableResults.Students.Student.TimetableData[`W${calender.Week}`]
-                    const week = [];
+        return new Promise((resolve, reject) => {
+            this.sendCommand({
+                    Command: 'GetStudentTimetable',
+                    Key: credentials.key,
+                    studentID: credentials.studentID,
+                    Grid: this.TT
+                }).then((timetable) => {
+                    this.sendCommand({
+                        Command: 'GetGlobals',
+                        Key: credentials.key
+                    }).then((response) => {
+                        try {
+                            var periodWeek = timetable.StudentTimetableResults.Students.Student.TimetableData[`W${calender.Week}`],
+                            count = 0;
 
-                    for (var weekDay = 1; weekDay <= 5; weekDay++) {
-                        const day = [];
+                        const week = [];
+                        for (var weekDay = 1; weekDay <= 5; weekDay++) {
+                            const day = [];
 
-                        let period = x[`D${weekDay}`]
-                        let count = 0;
+                            periodWeek[`D${weekDay}`].split('|').slice(2, -2).forEach((periods) => {
+                                var period = periods.split('-');
+                                count++;
 
-                        period.split('|').slice(2, -2).forEach((z) => {
-                            var period = z.split('-');
-                            count++;
-    
-                            day.push({
-                                Class: period[2],
-                                Room: period[4],
-                                Teacher: period[3],
-                                Time: response.GlobalsResults.StartTimes.Day[1].PeriodTime[count]
+                                day.push({
+                                    Class: period[2],
+                                    Room: period[4],
+                                    Teacher: period[3],
+                                    Time: response.GlobalsResults.StartTimes.Day[1].PeriodTime[count]
+                                });
+                            })
+
+                            count = 0;
+
+                            week.push({
+                                day
                             });
-                        })
-    
-                        week.push({
-                            Day: day
-                        });
-                    }
-                    
-                    return week
+                        }
+                        resolve(week)
+                        } catch (error) {
+                            reject(new Error("error"))
+                        }
+                        
+                    })
                 })
-            })
+        })
     }
 
     getNotices(credentials) {
