@@ -3,7 +3,8 @@ const {
 } = require('./package'),
     axios = require('axios'),
     qs = require('qs'),
-    parser = require('fast-xml-parser'),
+    Error = require('./errors.js')
+parser = require('fast-xml-parser'),
     moment = require('moment-timezone');
 
 class Kamar {
@@ -14,6 +15,7 @@ class Kamar {
         UserAgent = `Kamar-JS v${version}`,
         timezone = 'Pacific/Auckland',
         calender = undefined,
+        globals = undefined,
         timeout = 10000
     }) {
         if (!portal)
@@ -23,6 +25,7 @@ class Kamar {
         this.portal = portal;
         this.UserAgent = UserAgent;
         this.calender = calender;
+        this.globals = globals
         this.timezone = timezone;
         this.timeout = timeout;
         // ^ We need to be flexible for Chatham Is., Cook Is., Tokelau, & Niue, which
@@ -62,16 +65,15 @@ class Kamar {
      * @return {Calender} Returns a new Calender Week object
      */
     getCalendar(credentials) {
-        return this.sendCommand({
-            Command: 'GetCalendar',
-            Key: credentials.key,
-            Year: this.year
-        }).then(calender => {
-            this.calender = calender.CalendarResults.Days;
-
-            return calender.CalendarResults.Days.Day.find(Days => Days.Date === moment().format('YYYY-MM-D'))
-            throw calender.CalendarResults.Error;
-        });
+        return new Promise((resolve, reject) => {
+            this.sendCommand({
+                Command: 'GetCalendar',
+                Key: credentials.key,
+                Year: this.year
+            }).then(calender => {
+                resolve( calender.CalendarResults.Days.Day.find(Days => Days.Date === moment().format('YYYY-MM-D')))
+            });
+        })
     }
 
     /**
@@ -83,48 +85,42 @@ class Kamar {
     getTimetable(credentials, calender) {
         return new Promise((resolve, reject) => {
             this.sendCommand({
-                    Command: 'GetStudentTimetable',
-                    Key: credentials.key,
-                    studentID: credentials.studentID,
-                    Grid: this.TT
-                }).then((timetable) => {
-                    this.sendCommand({
-                        Command: 'GetGlobals',
-                        Key: credentials.key
-                    }).then((response) => {
-                        try {
-                            var periodWeek = timetable.StudentTimetableResults.Students.Student.TimetableData[`W${calender.Week}`],
-                            count = 0;
+                Command: 'GetStudentTimetable',
+                Key: credentials.key,
+                studentID: credentials.studentID,
+                Grid: this.TT
+            }).then((timetable) => {
+                this.sendCommand({
+                    Command: 'GetGlobals',
+                    Key: credentials.key
+                }).then(globals => {
+                    var periodWeek = timetable.StudentTimetableResults.Students.Student.TimetableData[`W${calender.Week}`],
+                        count = 0;
 
-                        const week = [];
-                        for (var weekDay = 1; weekDay <= 5; weekDay++) {
-                            const day = [];
+                    const week = [];
+                    for (var weekDay = 1; weekDay <= 5; weekDay++) {
+                        const day = [];
 
-                            periodWeek[`D${weekDay}`].split('|').slice(2, -2).forEach((periods) => {
-                                var period = periods.split('-');
-                                count++;
+                        periodWeek[`D${weekDay}`].split('|').slice(2, -2).forEach((periods) => {
+                            var period = periods.split('-');
+                            count++;
 
-                                day.push({
-                                    Class: period[2],
-                                    Room: period[4],
-                                    Teacher: period[3],
-                                    Time: response.GlobalsResults.StartTimes.Day[1].PeriodTime[count]
-                                });
-                            })
-
-                            count = 0;
-
-                            week.push({
-                                day
+                            day.push({
+                                Class: period[2],
+                                Room: period[4],
+                                Teacher: period[3],
+                                Time: globals.GlobalsResults.StartTimes.Day[1].PeriodTime[count]
                             });
-                        }
-                        resolve(week)
-                        } catch (error) {
-                            reject(new Error("error"))
-                        }
-                        
-                    })
+                        })
+
+                        count = 0;
+                        week.push({
+                            day
+                        });
+                    }
+                    resolve(week)
                 })
+            })
         })
     }
 
@@ -157,6 +153,23 @@ class Kamar {
                 }).then((response) => resolve(parser.parse(response.data)))
                 .catch((error) => reject(error))
         })
+    }
+
+    handleError(response) {
+        switch (response.ErrorCode) {
+            case 3: {
+                return new Error.AuthenticationError(response.Error)
+            }
+            case 2: {
+                return new Error.AuthenticationError(response.Error)
+            }
+            case 4: {
+                return new Error.UnknownCommand(response.Error)
+            }
+            case 7: {
+                return new Error.AccessDenied(response.Error)
+            }
+        }
     }
 }
 
