@@ -1,4 +1,4 @@
-# Kamar JS
+# :mortar_board: Kamar.js 
 
 ![NPM](https://img.shields.io/npm/l/kamar-js) ![npm](https://img.shields.io/npm/v/kamar-js?label=Version) ![GitHub repo size](https://img.shields.io/github/repo-size/Maverick-Calender/Kamar-js) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Maverick-Calender/Kamar-js) ![GitHub last commit](https://img.shields.io/github/last-commit/Maverick-Calender/Kamar-js)
 
@@ -6,7 +6,7 @@ Kamar JS is a flexible promise based api wrapper for the popular school manageme
 
 This is a passion project of a High School Student, so updates and bug fixes may not be the fastest however I will try my hardest to provide a powerful library for working with KAMAR
 
-## Installation
+## :man_factory_worker: Installation
 
 You can start using Kamar JS by installing it from npm using
 
@@ -14,7 +14,7 @@ You can start using Kamar JS by installing it from npm using
 npm i kamar-js
 ```
 
-## Getting Started
+## :woman_technologist: Getting Started
 
 You can create a new Kamar object by using
 
@@ -77,7 +77,7 @@ kamar.logon("web.student", "student").then(credentials => {
 
 ###### A example of the credentials object
 
-```
+```js
 {
   username: 'web.student',
   studentID: 17046,
@@ -96,7 +96,7 @@ kamar.getCalendar(credentials);
 
 ###### A example of the calender day object
 
-```
+```js
 {
   Date: '2021-06-14',
   Status: '',
@@ -124,7 +124,7 @@ After the authentication is ready we call `kamar.getCalender()`, this is the fir
 
 ###### A example of the Timetable object
 
-```
+```js
 [
   { Class: 'L2DIT', Room: 'B13', Teacher: 'SCH', Time: '08:45' },
   { Class: 'L2BUS', Room: 'R1', Teacher: 'MOC', Time: '09:50' },
