@@ -48,8 +48,8 @@ jobs:
       - run: npm run format
       - name: Get NPM Version
         id: npmversion
-        uses: action-get-npm-version@master
-      - uses: "marvinpinto/action-automatic-releases@latest"
+        uses: pchynoweth/action-get-npm-version@latest
+      - uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.PAKE_TOKEN }}"
           automatic_release_tag: "latest"
