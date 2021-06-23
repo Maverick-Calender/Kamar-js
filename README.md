@@ -1,4 +1,4 @@
-# :mortar_board: Kamar.js 
+# :mortar_board: Kamar.js
 
 ![NPM](https://img.shields.io/npm/l/kamar-js) ![npm](https://img.shields.io/npm/v/kamar-js?label=Version) ![GitHub repo size](https://img.shields.io/github/repo-size/Maverick-Calender/Kamar-js) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Maverick-Calender/Kamar-js) ![GitHub last commit](https://img.shields.io/github/last-commit/Maverick-Calender/Kamar-js)
 
@@ -126,25 +126,25 @@ After the authentication is ready we call `kamar.getCalender()`, this is the fir
 
 ```js
 [
-  { Class: 'L2DIT', Room: 'B13', Teacher: 'SCH', Time: '08:45' },
-  { Class: 'L2BUS', Room: 'R1', Teacher: 'MOC', Time: '09:50' },
+  { Class: "L2DIT", Room: "B13", Teacher: "SCH", Time: "08:45" },
+  { Class: "L2BUS", Room: "R1", Teacher: "MOC", Time: "09:50" },
   {
     Class: undefined,
     Room: undefined,
     Teacher: undefined,
-    Time: '10:50'
+    Time: "10:50",
   },
-  { Class: 'L2DVC', Room: 'T2', Teacher: 'STE', Time: '11:15' },
-  { Class: 'L2MA1', Room: 'B1', Teacher: 'NEV', Time: '12:15' },
+  { Class: "L2DVC", Room: "T2", Teacher: "STE", Time: "11:15" },
+  { Class: "L2MA1", Room: "B1", Teacher: "NEV", Time: "12:15" },
   {
     Class: undefined,
     Room: undefined,
     Teacher: undefined,
-    Time: '13:15'
+    Time: "13:15",
   },
-  { Class: 'Whanau', Room: 'B8', Teacher: 'SEA/JEN', Time: '14:00' },
-  { Class: 'L2EN1', Room: 'E5', Teacher: 'CHI', Time: '14:20' }
-]
+  { Class: "Whanau", Room: "B8", Teacher: "SEA/JEN", Time: "14:00" },
+  { Class: "L2EN1", Room: "E5", Teacher: "CHI", Time: "14:20" },
+];
 ```
 
 Finally we call `kamar.GetTimetable()` This takes the calender and credentials objects from before and turns them into a array of Periods with `Class`, `Room`, `Teacher` and `Time`. If undefined this is because of unmarked events, assemblies or lunch breaks.

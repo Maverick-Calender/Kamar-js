@@ -48,6 +48,10 @@ class Kamar {
         Password: password,
       }).then((credentials) => {
         try {
+          if (this.checkCommonErrors(credentials.LogonResults) != false) 
+              throw this.checkCommonErrors(credentials.LogonResults);
+
+
           if (credentials.LogonResults.Success === "YES") {
             resolve({
               username,
@@ -78,6 +82,9 @@ class Kamar {
         Year: this.year,
       }).then((calender) => {
         try {
+          if (this.checkCommonErrors(calender.CalendarResults) != false) 
+              throw this.checkCommonErrors(calender.CalendarResults);
+
           resolve(
             calender.CalendarResults.Days.Day.find(
               (Days) => Days.Date === moment().format("YYYY-MM-D")
@@ -109,6 +116,11 @@ class Kamar {
           Key: credentials.key,
         }).then((globals) => {
           try {
+            if (this.checkCommonErrors(timetable.StudentTimetableResults) != false) 
+              throw this.checkCommonErrors(timetable.StudentTimetableResults);
+            if (this.checkCommonErrors(globals.GlobalsResults) != false) 
+              throw this.checkCommonErrors(globals.GlobalsResults);
+
             const periodWeek =
               timetable.StudentTimetableResults.Students.Student.TimetableData[
                 `W${calender.Week}`
@@ -154,6 +166,9 @@ class Kamar {
         ShowAll: "YES",
       }).then((notices) => {
         try {
+          if (this.checkCommonErrors(notices.NoticesResults) != false) 
+            throw this.checkCommonErrors(notices.NoticesResults);
+
           resolve({
             meeting: notices.NoticesResults.MeetingNotices.Meeting,
             general: notices.NoticesResults.GeneralNotices.General,
@@ -165,6 +180,8 @@ class Kamar {
     });
   }
 
+  // This is the main request handler for the Kamar API, functions pass a command, key and
+  // any extra arguments
   sendCommand(form) {
     return new Promise((resolve, reject) => {
       axios({
@@ -181,6 +198,21 @@ class Kamar {
         .then((response) => resolve(parser.parse(response.data)))
         .catch((error) => reject(error));
     });
+  }
+
+  checkCommonErrors(response) {
+    switch (response.ErrorCode) {
+      case -2:
+        return "Key Missing";
+      case -3:
+        return "Invalid Key";
+      case -4:
+        return "Unknown Page";
+      case -7:
+        return "Access Denied";
+      default:
+        return false;
+    }
   }
 }
 
