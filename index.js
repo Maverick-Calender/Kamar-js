@@ -1,8 +1,8 @@
-const { version } = require("./package");
-const axios = require("axios");
-const qs = require("qs");
-const parser = require("fast-xml-parser");
-const moment = require("moment-timezone");
+const {version} = require('./package');
+const axios = require('axios');
+const qs = require('qs');
+const parser = require('fast-xml-parser');
+const moment = require('moment-timezone');
 
 class Kamar {
   constructor({
@@ -10,16 +10,16 @@ class Kamar {
     year = new Date().getFullYear(),
     TT,
     UserAgent = `Kamar-JS v${version}`,
-    timezone = "Pacific/Auckland",
+    timezone = 'Pacific/Auckland',
     calender = undefined,
     globals = undefined,
     timeout = 10000,
   }) {
     if (!portal) {
-      throw new Error("portal URL must be provided. e.g. `demo.school.kiwi` ");
+      throw new Error('portal URL must be provided. e.g. `demo.school.kiwi` ');
     }
     this.year = year;
-    this.TT = TT || this.year + "TT";
+    this.TT = TT || this.year + 'TT';
     this.portal = portal;
     this.UserAgent = UserAgent;
     this.calender = calender;
@@ -30,7 +30,7 @@ class Kamar {
     //   are all part of NZ but in a different timezone, which can cause issues.
 
     moment.tz.setDefault(this.timezone);
-    moment.locale("en-nz");
+    moment.locale('en-nz');
   }
 
   /**
@@ -42,17 +42,16 @@ class Kamar {
   logon(username, password) {
     return new Promise((resolve, reject) => {
       this.sendCommand({
-        Command: "Logon",
-        Key: "vtku",
+        Command: 'Logon',
+        Key: 'vtku',
         Username: username,
         Password: password,
-      }).then((credentials) => {
+      }).then(credentials => {
         try {
-          if (this.checkCommonErrors(credentials.LogonResults) != false) 
-              throw this.checkCommonErrors(credentials.LogonResults);
+          if (this.checkCommonErrors(credentials.LogonResults) != false)
+            throw this.checkCommonErrors(credentials.LogonResults);
 
-
-          if (credentials.LogonResults.Success === "YES") {
+          if (credentials.LogonResults.Success === 'YES') {
             resolve({
               username,
               studentID: credentials.LogonResults.CurrentStudent,
@@ -77,17 +76,17 @@ class Kamar {
   getCalendar(credentials) {
     return new Promise((resolve, reject) => {
       this.sendCommand({
-        Command: "GetCalendar",
+        Command: 'GetCalendar',
         Key: credentials.key,
         Year: this.year,
-      }).then((calender) => {
+      }).then(calender => {
         try {
-          if (this.checkCommonErrors(calender.CalendarResults) != false) 
-              throw this.checkCommonErrors(calender.CalendarResults);
+          if (this.checkCommonErrors(calender.CalendarResults) != false)
+            throw this.checkCommonErrors(calender.CalendarResults);
 
           resolve(
             calender.CalendarResults.Days.Day.find(
-              (Days) => Days.Date === moment().format("YYYY-MM-D")
+              Days => Days.Date === moment().format('YYYY-MM-D')
             )
           );
         } catch (error) {
@@ -106,19 +105,21 @@ class Kamar {
   getTimetable(credentials, calender) {
     return new Promise((resolve, reject) => {
       this.sendCommand({
-        Command: "GetStudentTimetable",
+        Command: 'GetStudentTimetable',
         Key: credentials.key,
         studentID: credentials.studentID,
         Grid: this.TT,
-      }).then((timetable) => {
+      }).then(timetable => {
         this.sendCommand({
-          Command: "GetGlobals",
+          Command: 'GetGlobals',
           Key: credentials.key,
-        }).then((globals) => {
+        }).then(globals => {
           try {
-            if (this.checkCommonErrors(timetable.StudentTimetableResults) != false) 
+            if (
+              this.checkCommonErrors(timetable.StudentTimetableResults) != false
+            )
               throw this.checkCommonErrors(timetable.StudentTimetableResults);
-            if (this.checkCommonErrors(globals.GlobalsResults) != false) 
+            if (this.checkCommonErrors(globals.GlobalsResults) != false)
               throw this.checkCommonErrors(globals.GlobalsResults);
 
             const periodWeek =
@@ -131,10 +132,10 @@ class Kamar {
               const day = [];
 
               periodWeek[`D${weekDay}`]
-                .split("|")
+                .split('|')
                 .slice(2, -2)
                 .forEach((periods, index) => {
-                  const period = periods.split("-");
+                  const period = periods.split('-');
 
                   day.push({
                     Class: period[2],
@@ -160,13 +161,13 @@ class Kamar {
   getNotices(credentials) {
     return new Promise((resolve, reject) => {
       this.sendCommand({
-        Command: "GetNotices",
+        Command: 'GetNotices',
         Key: credentials.key,
-        Date: moment().format("L"),
-        ShowAll: "YES",
-      }).then((notices) => {
+        Date: moment().format('L'),
+        ShowAll: 'YES',
+      }).then(notices => {
         try {
-          if (this.checkCommonErrors(notices.NoticesResults) != false) 
+          if (this.checkCommonErrors(notices.NoticesResults) != false)
             throw this.checkCommonErrors(notices.NoticesResults);
 
           resolve({
@@ -185,31 +186,31 @@ class Kamar {
   sendCommand(form) {
     return new Promise((resolve, reject) => {
       axios({
-        method: "post",
+        method: 'post',
         url: `https://${this.portal}/api/api.php`,
         data: qs.stringify(form),
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "User-Agent": this.UserAgent,
-          Origin: "file://",
-          "X-Requested-With": "nz.co.KAMAR",
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': this.UserAgent,
+          Origin: 'file://',
+          'X-Requested-With': 'nz.co.KAMAR',
         },
       })
-        .then((response) => resolve(parser.parse(response.data)))
-        .catch((error) => reject(error));
+        .then(response => resolve(parser.parse(response.data)))
+        .catch(error => reject(error));
     });
   }
 
   checkCommonErrors(response) {
     switch (response.ErrorCode) {
       case -2:
-        return "Key Missing";
+        return 'Key Missing';
       case -3:
-        return "Invalid Key";
+        return 'Invalid Key';
       case -4:
-        return "Unknown Page";
+        return 'Unknown Page';
       case -7:
-        return "Access Denied";
+        return 'Access Denied';
       default:
         return false;
     }

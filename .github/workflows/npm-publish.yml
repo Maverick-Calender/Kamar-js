@@ -27,12 +27,13 @@ jobs:
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
+      - run: npm run format
       - run: npm ci
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
 
-  publish-gpr:
+  publish-release:
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -44,7 +45,16 @@ jobs:
         with:
           node-version: 12
           registry-url: https://npm.pkg.github.com/
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.PAKE_TOKEN}}
+      - run: npm run format
+      - name: Get NPM Version
+        id: npmversion
+        uses: action-get-npm-version@master
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.PAKE_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "${{ steps.npmversion.outputs.version }}"
+          files: |
+            *.*
+

@@ -1,6 +1,6 @@
 # :mortar_board: Kamar.js
 
-![NPM](https://img.shields.io/npm/l/kamar-js) ![npm](https://img.shields.io/npm/v/kamar-js?label=Version) ![GitHub repo size](https://img.shields.io/github/repo-size/Maverick-Calender/Kamar-js) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Maverick-Calender/Kamar-js) ![GitHub last commit](https://img.shields.io/github/last-commit/Maverick-Calender/Kamar-js)
+![NPM](https://img.shields.io/npm/l/kamar-js) ![npm](https://img.shields.io/npm/v/kamar-js?label=Version) ![GitHub repo size](https://img.shields.io/github/repo-size/Maverick-Calender/Kamar-js) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Maverick-Calender/Kamar-js) ![GitHub last commit](https://img.shields.io/github/last-commit/Maverick-Calender/Kamar-js) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat)](https://github.com/prettier/prettier)
 
 Kamar JS is a flexible promise based api wrapper for the popular school management suite KAMAR
 
@@ -19,8 +19,8 @@ npm i kamar-js
 You can create a new Kamar object by using
 
 ```javascript
-const Kamar = require("kamar-js"),
-  kamar = new Kamar({ portal: "demo.school.kiwi" });
+const Kamar = require('kamar-js'),
+  kamar = new Kamar({portal: 'demo.school.kiwi'});
 ```
 
 This object has many options, here is a list of what it will accept
@@ -43,15 +43,15 @@ Here are some example and breakdowns explaining how to use kamar js
 #### Example
 
 ```javascript
-const Kamar = require("kamar-js"),
-  kamar = new Kamar({ portal: "demo.school.kiwi" });
+const Kamar = require('kamar-js'),
+  kamar = new Kamar({portal: 'demo.school.kiwi'});
 
 // Authenticates the student using the portal set above
-kamar.logon("web.student", "student").then((credentials) => {
+kamar.logon('web.student', 'student').then(credentials => {
   kamar
     .getCalendar(credentials)
-    .then((calender) => kamar.getTimetable(credentials, calender))
-    .then((timetable) => {
+    .then(calender => kamar.getTimetable(credentials, calender))
+    .then(timetable => {
       console.log(timetable);
       // Anything you want to do with the timetable.
     });
@@ -63,8 +63,8 @@ kamar.logon("web.student", "student").then((credentials) => {
 ###### Creating a Kamar object
 
 ```javascript
-const Kamar = require("kamar-js"),
-  kamar = new Kamar({ portal: "demo.school.kiwi" });
+const Kamar = require('kamar-js'),
+  kamar = new Kamar({portal: 'demo.school.kiwi'});
 ```
 
 This is where we construct the new Kamar object, the only required parameter is `portal`
@@ -126,24 +126,24 @@ After the authentication is ready we call `kamar.getCalender()`, this is the fir
 
 ```js
 [
-  { Class: "L2DIT", Room: "B13", Teacher: "SCH", Time: "08:45" },
-  { Class: "L2BUS", Room: "R1", Teacher: "MOC", Time: "09:50" },
+  {Class: 'L2DIT', Room: 'B13', Teacher: 'SCH', Time: '08:45'},
+  {Class: 'L2BUS', Room: 'R1', Teacher: 'MOC', Time: '09:50'},
   {
     Class: undefined,
     Room: undefined,
     Teacher: undefined,
-    Time: "10:50",
+    Time: '10:50',
   },
-  { Class: "L2DVC", Room: "T2", Teacher: "STE", Time: "11:15" },
-  { Class: "L2MA1", Room: "B1", Teacher: "NEV", Time: "12:15" },
+  {Class: 'L2DVC', Room: 'T2', Teacher: 'STE', Time: '11:15'},
+  {Class: 'L2MA1', Room: 'B1', Teacher: 'NEV', Time: '12:15'},
   {
     Class: undefined,
     Room: undefined,
     Teacher: undefined,
-    Time: "13:15",
+    Time: '13:15',
   },
-  { Class: "Whanau", Room: "B8", Teacher: "SEA/JEN", Time: "14:00" },
-  { Class: "L2EN1", Room: "E5", Teacher: "CHI", Time: "14:20" },
+  {Class: 'Whanau', Room: 'B8', Teacher: 'SEA/JEN', Time: '14:00'},
+  {Class: 'L2EN1', Room: 'E5', Teacher: 'CHI', Time: '14:20'},
 ];
 ```
 
