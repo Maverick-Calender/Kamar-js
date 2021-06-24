@@ -1,6 +1,6 @@
 {
   "name": "kamar-js",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A simple, promised based wrapper for working with the Kamar API",
   "author": {
     "name": "Jonathan Voss",
